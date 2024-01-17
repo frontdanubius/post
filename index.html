@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +30,9 @@
       border-radius: 8px;
     }
 
-    h1, h2, p {
+    h1,
+    h2,
+    p {
       color: #333;
     }
 
@@ -42,7 +45,8 @@
       margin-bottom: 8px;
     }
 
-    textarea, input {
+    textarea,
+    input {
       margin-bottom: 16px;
       padding: 8px;
       border: 1px solid #ccc;
@@ -83,13 +87,14 @@
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1>Diego - notes</h1>
   </header>
 
   <main>
-    <form id="noteForm">
+    <form id="noteForm" enctype="multipart/form-data">
       <label for="note">Note:</label>
       <textarea id="note" name="note" required></textarea>
 
@@ -139,7 +144,7 @@
 
         const notes = await response.json();
 
-               notesDiv.innerHTML = '';
+        notesDiv.innerHTML = '';
 
         notes.forEach((note) => {
           const noteElement = document.createElement('div');
@@ -156,8 +161,8 @@
       }
     }
 
-    loadNotes(); 
+    loadNotes();
   </script>
 </body>
-</html>
 
+</html>
