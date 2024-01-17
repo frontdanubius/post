@@ -2,35 +2,42 @@ const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-mongoose.connect('your-mongodb-atlas-connection-string', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('your-mongodb-atlas-connection-string', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 const storage = multer.diskStorage({
-  destination: './uploads/',
-  filename: function (req, file, cb) {
+  destination: (req, file, cb) => {
+    const uploadDir = './uploads/';
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir);
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage
+});
 
 const noteSchema = new mongoose.Schema({
   note: String,
-  image: String,
+  image: String
 });
 
 const Note = mongoose.model('Note', noteSchema);
 
 app.use(express.static('public'));
-
-// Add cache control headers for images
-app.use('/uploads', (req, res, next) => {
-  res.set('Cache-Control', 'public, max-age=31557600'); // 1 year cache control
-  next();
-}, express.static('uploads'));
+app.use('/uploads', express.static('uploads'));
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -42,15 +49,21 @@ app.post('/api/notes', upload.single('image'), async (req, res) => {
   try {
     const newNote = new Note({
       note: req.body.note,
-      image: req.file.filename,
+      image: req.file.filename
     });
 
     await newNote.save();
 
-    res.json({ success: true, message: 'Note and image uploaded successfully!' });
+    res.json({
+      success: true,
+      message: 'Note and image uploaded successfully!'
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
+    res.status(500).json({
+      success: false,
+      error: 'Internal Server Error'
+    });
   }
 });
 
@@ -59,7 +72,10 @@ app.get('/api/notes', async (req, res) => {
     const notes = await Note.find();
     res.json(notes);
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
+    res.status(500).json({
+      success: false,
+      error: 'Internal Server Error'
+    });
   }
 });
 
