@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Picture Notes</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f8f8;
+    }
+
+    header {
+      text-align: center;
+      background-color: #4267B2; /* Facebook blue color */
+      color: #fff;
+      padding: 1rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    main {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    h1, h2, p {
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 8px;
+    }
+
+    textarea, input {
+      margin-bottom: 16px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #4267B2;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #2a4f8e;
+    }
+
+    #notes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .note {
+      flex: 0 0 48%;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .note img {
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Diego - notes</h1>
+  </header>
+
+  <main>
+    <form id="noteForm">
+      <label for="note">Note:</label>
+      <textarea id="note" name="note" required></textarea>
+
+      <label for="image">Image:</label>
+      <input type="file" id="image" name="image" accept="image/*" required>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <div id="notes"></div>
+  </main>
+
+  <script>
+    const noteForm = document.getElementById('noteForm');
+    const notesDiv = document.getElementById('notes');
+
+    noteForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(noteForm);
+      try {
+        const response = await fetch('/api/notes', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save note');
+        }
+
+        const result = await response.json();
+
+        alert(result.message);
+        loadNotes();
+      } catch (error) {
+        console.error(error);
+        alert('Failed to save note');
+      }
+    });
+
+    async function loadNotes() {
+      try {
+        const response = await fetch('/api/notes');
+        const notes = await response.json();
+
+        notesDiv.innerHTML = '';
+
+        notes.forEach((note) => {
+          const noteElement = document.createElement('div');
+          noteElement.className = 'note';
+          noteElement.innerHTML = `
+            <p>${note.note}</p>
+            <img src="/uploads/${note.image}" alt="Note Image">
+          `;
+          notesDiv.appendChild(noteElement);
+        });
+      } catch (error) {
+        console.error(error);
+        alert('Failed to load notes');
+      }
+    }
+
+    loadNotes(); 
+  </script>
+</body>
+</html>
