@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Picture Notes</title>
+  <title>Notes</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -133,6 +133,10 @@
     async function loadNotes() {
       try {
         const response = await fetch('/api/notes');
+        if (!response.ok) {
+          throw new Error('Failed to fetch notes');
+        }
+
         const notes = await response.json();
 
         notesDiv.innerHTML = '';
@@ -148,7 +152,7 @@
         });
       } catch (error) {
         console.error(error);
-        alert('Failed to load notes');
+        alert('Failed to load notes. Check console for details.');
       }
     }
 
