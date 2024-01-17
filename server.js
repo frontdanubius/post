@@ -4,10 +4,10 @@ const multer = require('multer');
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // Use process.env.PORT for deployment
 
-// Connect to MongoDB (Make sure MongoDB is running)
-mongoose.connect('mongodb://localhost/pictureNotes', { useNewUrlParser: true, useUnifiedTopology: true });
+// Connect to MongoDB using a cloud-based service (replace connection string with your MongoDB Atlas connection string)
+mongoose.connect('your-mongodb-atlas-connection-string', { useNewUrlParser: true, useUnifiedTopology: true });
 
 // Multer configuration for handling file uploads
 const storage = multer.diskStorage({
@@ -30,7 +30,7 @@ const Note = mongoose.model('Note', noteSchema);
 
 // Middleware to serve static files from the public directory
 app.use(express.static('public'));
-app.use('/uploads', express.static('uploads')); // Add this line to serve images
+app.use('/uploads', express.static('uploads')); // Serve images
 
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
@@ -52,7 +52,7 @@ app.post('/api/notes', upload.single('image'), async (req, res) => {
     // Send a success response
     res.json({ success: true, message: 'Note and image uploaded successfully!' });
   } catch (error) {
-    console.error(error); // Log the error to the console for debugging
+    console.error(error);
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 });
