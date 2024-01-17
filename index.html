@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notes</title>
+  <title>Picture Notes</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -139,14 +139,14 @@
 
         const notes = await response.json();
 
-        notesDiv.innerHTML = '';
+               notesDiv.innerHTML = '';
 
         notes.forEach((note) => {
           const noteElement = document.createElement('div');
           noteElement.className = 'note';
           noteElement.innerHTML = `
             <p>${note.note}</p>
-            <img src="/uploads/${note.image}" alt="Note Image">
+            <img src="/uploads/${note.image}?${new Date().getTime()}" alt="Note Image">
           `;
           notesDiv.appendChild(noteElement);
         });
@@ -160,3 +160,4 @@
   </script>
 </body>
 </html>
+
