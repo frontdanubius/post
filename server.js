@@ -4,12 +4,10 @@ const multer = require('multer');
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 3000; // Use process.env.PORT for deployment
+const port = process.env.PORT || 3000;
 
-// Connect to MongoDB using a cloud-based service (replace connection string with your MongoDB Atlas connection string)
 mongoose.connect('your-mongodb-atlas-connection-string', { useNewUrlParser: true, useUnifiedTopology: true });
 
-// Multer configuration for handling file uploads
 const storage = multer.diskStorage({
   destination: './uploads/',
   filename: function (req, file, cb) {
@@ -19,23 +17,23 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Define a MongoDB schema for notes
 const noteSchema = new mongoose.Schema({
   note: String,
   image: String,
 });
 
-// Create a model based on the schema
 const Note = mongoose.model('Note', noteSchema);
 
-// Middleware to serve static files from the public directory
 app.use(express.static('public'));
-app.use('/uploads', express.static('uploads')); // Serve images
 
-// Middleware to parse form data
+// Add cache control headers for images
+app.use('/uploads', (req, res, next) => {
+  res.set('Cache-Control', 'public, max-age=31557600'); // 1 year cache control
+  next();
+}, express.static('uploads'));
+
 app.use(express.urlencoded({ extended: true }));
 
-// Route to serve the main HTML page
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -49,7 +47,6 @@ app.post('/api/notes', upload.single('image'), async (req, res) => {
 
     await newNote.save();
 
-    // Send a success response
     res.json({ success: true, message: 'Note and image uploaded successfully!' });
   } catch (error) {
     console.error(error);
@@ -60,7 +57,6 @@ app.post('/api/notes', upload.single('image'), async (req, res) => {
 app.get('/api/notes', async (req, res) => {
   try {
     const notes = await Note.find();
-
     res.json(notes);
   } catch (error) {
     res.status(500).json({ success: false, error: 'Internal Server Error' });
