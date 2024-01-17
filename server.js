@@ -30,6 +30,7 @@ const Note = mongoose.model('Note', noteSchema);
 
 // Middleware to serve static files from the public directory
 app.use(express.static('public'));
+app.use('/uploads', express.static('uploads')); // Add this line to serve images
 
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
